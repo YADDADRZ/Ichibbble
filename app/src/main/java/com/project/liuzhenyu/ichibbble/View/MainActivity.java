@@ -1,6 +1,7 @@
 package com.project.liuzhenyu.ichibbble.View;
 
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -11,10 +12,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.project.liuzhenyu.ichibbble.Dribbble.Dribbble;
 import com.project.liuzhenyu.ichibbble.R;
+import com.project.liuzhenyu.ichibbble.Utils.ImageUtils;
 import com.project.liuzhenyu.ichibbble.View.shot_list.ShotListFragment;
 
 import butterknife.BindView;
@@ -71,12 +77,12 @@ public class MainActivity extends AppCompatActivity {
     the configuration has changed and can simply re-assign all your resources that
     provide alternatives to the configuration that you're handling.
      --------------------------------------------------------------------------------------------*/
-    /*@Override
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggles
         drawerToggle.onConfigurationChanged(newConfig);
-    }*/
+    }
 
     // when actionBar item get clicked
     @Override
@@ -97,6 +103,28 @@ public class MainActivity extends AppCompatActivity {
         );
 
         drawerLayout.setDrawerListener(drawerToggle);
+
+        // User Picture & name
+
+        // This will bind navigationView with the header we create
+        View headerView = navigationView.inflateHeaderView(R.layout.drawer_header);
+
+        ((TextView) headerView.findViewById(R.id.nav_header_user_name)).setText(
+                Dribbble.getCurrentUser().name);
+
+        ImageView userPicture = (ImageView) headerView.findViewById(R.id.nav_header_user_picture);
+        ImageUtils.loadUserPicture(this, userPicture, Dribbble.getCurrentUser().avatar_url);
+
+        // Log out
+        headerView.findViewById(R.id.nav_header_logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dribbble.logout(MainActivity.this);
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override

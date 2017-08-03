@@ -29,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         // bind button to this loginBtn variable use ButterKnife
         ButterKnife.bind(this);
+
         Dribbble.init(this);
 
         if (!Dribbble.isLogin()){
