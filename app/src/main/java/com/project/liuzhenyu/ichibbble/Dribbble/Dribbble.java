@@ -15,11 +15,15 @@ import android.util.Log;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.project.liuzhenyu.ichibbble.Dribbble.Auth.DribbbleException;
+import com.project.liuzhenyu.ichibbble.Model.Shot;
 import com.project.liuzhenyu.ichibbble.Model.User;
 import com.project.liuzhenyu.ichibbble.Utils.ModelUtils;
 import com.project.liuzhenyu.ichibbble.View.LoginActivity;
+import com.project.liuzhenyu.ichibbble.View.base.DribbbleTask;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import okhttp3.OkHttpClient;
@@ -32,17 +36,33 @@ public class Dribbble {
       Constant Variable
       API Page: http://developer.dribbble.com/v1/users/
      --------------------------------------------------------------------------------------------*/
-
+    public static final int COUNT_PER_LOAD = 12;
+    // Request url
     private static final String API_URL = "https://api.dribbble.com/v1/";
     private static final String USER_END_POINT = API_URL + "user";
+    private static final String USERS_END_POINT = API_URL + "users";
+    private static final String SHOT_END_POINT = API_URL + "shots";
+    private static final String BUCKETS_END_POINT = API_URL + "buckets";
+
+    // SharePreference name; special create for access token
     private static final String SP_AUTH = "auth";
-    private static final String SP_USER = "user";
+
+    // sharePreference key name
     private static final String KEY_ACCESS_TOKEN = "access_token";
     private static final String KEY_USER = "user";
+
+    // Memory variable
     private static String accessToken;
-    private static OkHttpClient client = new OkHttpClient();
-    private static final TypeToken<User> USER_TYPE = new TypeToken<User>(){}; // Get User Type
     private static User user;
+
+    // Typetoken
+    private static final TypeToken<User> USER_TYPE = new TypeToken<User>(){}; // Get User Type
+    private static final TypeToken<Shot> SHOT_TYPE = new TypeToken<Shot>(){};
+    private static final TypeToken<List<Shot>> SHOTS_TYPE = new TypeToken<List<Shot>>(){};
+
+    // Http client
+    private static OkHttpClient client = new OkHttpClient();
+
     /*---------------------------------------------------------------------------------------------
       Login & Logout
      --------------------------------------------------------------------------------------------*/
@@ -66,19 +86,14 @@ public class Dribbble {
     }
 
     public static void login(@NonNull Context context, @NonNull String accessToken)
-            throws IOException {
+            throws DribbbleException {
         // store access token
         Dribbble.accessToken = accessToken;
         Log.i("TOKEN", accessToken);
         storeAccessToken(context, accessToken);
 
-        // get and store user info
-        try {
-            Dribbble.user = new FetchUserInfo().execute().get();
-            storeUser(context, user);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        Dribbble.user = fetchUserInfo();
+        storeUser(context, user);
     }
 
     public static void logout(@NonNull Context context) {
@@ -110,38 +125,54 @@ public class Dribbble {
         sp.edit().putString(KEY_ACCESS_TOKEN, accessToken).apply();
     }
 
-
     /*---------------------------------------------------------------------------------------------
-      AsyncTask GET request user info and store in SP
+      GET request user info and store in SP
      ---------------------------------------------------------------------------------------------*/
 
-    private static class FetchUserInfo extends AsyncTask<Void, Void, User> {
-
-        @Override
-        protected User doInBackground(Void... voids) {
-            Request resquest = authRequestBuilder();
-
-            try {
-                Response response = client.newCall(resquest).execute();
-                Log.i("response", response.toString());
-                return parseResponse(response, USER_TYPE);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return new User();
+    private static User fetchUserInfo() throws DribbbleException {
+        Request resquest = authRequestBuilder(USER_END_POINT);
+        try {
+            Response response = client.newCall(resquest).execute();
+            return parseResponse(response, USER_TYPE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new DribbbleException(e.getMessage());
         }
     }
 
-    private static Request authRequestBuilder() {
+    private static Request authRequestBuilder(String url) {
         return new Request.Builder().addHeader("Authorization", "Bearer " + accessToken)
-                .url(USER_END_POINT).build();
+                .url(url).build();
     }
 
     private static <T> T parseResponse(Response response, TypeToken<T> typeToken)
             throws IOException, JsonSyntaxException{
         String responseString = response.body().string();
-        Log.i("user_str", responseString);
+        Log.i("RESPONSE", responseString);
         return ModelUtils.toObject(responseString, typeToken);
+    }
+
+    /*----------------------------------------------------------------------------------------------
+      Shot info Retrieval Method
+     ---------------------------------------------------------------------------------------------*/
+
+    // GET SHOTS
+    // This method must run on the non-main thread
+    public static List<Shot> getShots(int page) throws DribbbleException{
+        Request request = authRequestBuilder(SHOT_END_POINT + "?page=" + page);
+        Log.i("SHOTS_REQUEST", request.toString());
+        try {
+            Response response = client.newCall(request).execute();
+            Log.i("SHOTS_RESPONSE", response.toString());
+            return parseResponse(response, SHOTS_TYPE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new DribbbleException(e.getMessage());
+        }
+    }
+
+
+    public static Boolean isLikeShot(String id) {
+        return false;
     }
 }

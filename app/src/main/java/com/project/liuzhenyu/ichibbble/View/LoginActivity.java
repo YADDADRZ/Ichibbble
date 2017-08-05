@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.project.liuzhenyu.ichibbble.Dribbble.Auth.Auth;
 import com.project.liuzhenyu.ichibbble.Dribbble.Auth.AuthActivity;
+import com.project.liuzhenyu.ichibbble.Dribbble.Auth.DribbbleException;
 import com.project.liuzhenyu.ichibbble.Dribbble.Dribbble;
 import com.project.liuzhenyu.ichibbble.R;
 
@@ -52,17 +53,26 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Auth.REQ_CODE && resultCode == RESULT_OK) {
             final String authCode = data.getStringExtra(AuthActivity.KEY_CODE);
-            String token;
-            try {
-                token = Auth.fetchAccessToken(authCode);
-                Log.i("AUTH_CODE", token);
-                Dribbble.login(LoginActivity.this, token);
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            } catch (InterruptedException | ExecutionException | IOException e) {
-                e.printStackTrace();
-            }
+
+            // non-main thread fetch token and start login
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String token;
+                    try {
+                        token = Auth.fetchAccessToken(authCode);
+                        Log.i("AUTH_CODE", token);
+                        Dribbble.login(LoginActivity.this, token);
+                        // Enter MainActivity
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } catch (InterruptedException | ExecutionException | DribbbleException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
         }
     }
 }
