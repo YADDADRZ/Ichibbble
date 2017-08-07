@@ -2,7 +2,7 @@ package com.project.liuzhenyu.ichibbble.Dribbble;
 
 /*--------------------------------------------------------------------------------------------------
  * Created by liuzhenyu on 7/28/17.
- * This class provide method for all data retrieval method, and contition check method, login/logout
+ * This class provide method for all API data retrieval method, and contition check method, login/logout
  --------------------------------------------------------------------------------------------------*/
 
 import android.content.Context;
@@ -78,7 +78,6 @@ public class Dribbble {
         return ModelUtils.read(context, KEY_USER, USER_TYPE);
     }
 
-
     private static String loadAccessToken(Context context) {
         SharedPreferences sp = context.getApplicationContext()
                 .getSharedPreferences(SP_AUTH, Context.MODE_PRIVATE);
@@ -148,14 +147,13 @@ public class Dribbble {
     private static <T> T parseResponse(Response response, TypeToken<T> typeToken)
             throws IOException, JsonSyntaxException{
         String responseString = response.body().string();
-        Log.i("RESPONSE", responseString);
+        Log.i("USER_INFO_RESPONSE", responseString);
         return ModelUtils.toObject(responseString, typeToken);
     }
 
     /*----------------------------------------------------------------------------------------------
-      Shot info Retrieval Method
+      Shots info Retrieval Method (List<Shot>); 12 shots(one page) per API request.
      ---------------------------------------------------------------------------------------------*/
-
     // GET SHOTS
     // This method must run on the non-main thread
     public static List<Shot> getShots(int page) throws DribbbleException{
@@ -170,7 +168,6 @@ public class Dribbble {
             throw new DribbbleException(e.getMessage());
         }
     }
-
 
     public static Boolean isLikeShot(String id) {
         return false;

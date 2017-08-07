@@ -4,11 +4,11 @@ import android.os.AsyncTask;
 
 import com.project.liuzhenyu.ichibbble.Dribbble.Auth.DribbbleException;
 
-import okhttp3.Response;
-
-/**
+/*--------------------------------------------------------------------------------------------------
  * Created by liuzhenyu on 8/3/17.
- */
+ * This Abstract class provide the base for all AsyncTask activity with a 3 callback function
+ * Only doSomething runs on non-UI thread; other two will execute on UI thread
+ -------------------------------------------------------------------------------------------------*/
 
 public abstract class DribbbleTask<Params, Progress, Result> extends
         AsyncTask<Params, Progress, Result> {

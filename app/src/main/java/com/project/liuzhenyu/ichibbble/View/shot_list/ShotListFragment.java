@@ -38,10 +38,10 @@ import java.util.concurrent.ExecutionException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
+/*--------------------------------------------------------------------------------------------------
  * Created by liuzhenyu on 7/30/17.
  * Fragment covered one recyclerView and this recyclerView contain multiple card
- */
+ -------------------------------------------------------------------------------------------------*/
 
 public class ShotListFragment extends Fragment {
 
@@ -138,12 +138,10 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
         protected void onSuccess(List<Shot> shots) {
             adapter.setShowLoading(shots.size() >= Dribbble.COUNT_PER_LOAD);
             if (refresh) {
-                Toast.makeText(getContext(), "Refreshing", Toast.LENGTH_LONG).show();
                 swipeRefreshLayout.setRefreshing(false);
                 adapter.setData(shots);
             } else {
                 swipeRefreshLayout.setEnabled(true);
-                Toast.makeText(getContext(), "NOT REFRESHING", Toast.LENGTH_LONG).show();
                 adapter.addLast(shots);
             }
         }

@@ -1,6 +1,6 @@
 package com.project.liuzhenyu.ichibbble.View.shot_detail;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
+/*--------------------------------------------------------------------------------------------------
  * Created by liuzhenyu on 8/3/17.
- */
+--------------------------------------------------------------------------------------------------*/
 
-public class ShotFragment extends Fragment{
+public class ShotFragment extends Fragment {
 
     public static final String KEY_SHOT = "shot";
 
