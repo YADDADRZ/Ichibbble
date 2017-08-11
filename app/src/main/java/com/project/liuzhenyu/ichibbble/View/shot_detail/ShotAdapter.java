@@ -1,7 +1,9 @@
 package com.project.liuzhenyu.ichibbble.View.shot_detail;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -78,6 +80,11 @@ public class ShotAdapter extends RecyclerView.Adapter {
                         detailViewHolder.author_picture,
                         shot.user.avatar_url);
                 // TODO clickListener
+
+                Drawable likeDrawable = shot.liked?
+                        ContextCompat.getDrawable(getContext(), R.drawable.ic_favorite_red_600_18dp)
+                        : ContextCompat.getDrawable(getContext(), R.drawable.ic_favorite_border_black_18dp);
+                detailViewHolder.like_button.setImageDrawable(likeDrawable);
                 break;
         }
     }

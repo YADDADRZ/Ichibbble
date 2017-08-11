@@ -85,6 +85,7 @@ public abstract class InfiniteAdapter<T> extends RecyclerView.Adapter<BaseViewHo
         }
     }
 
+    // When reach to the end, we show loading animation
     @Override
     public int getItemViewType(int position) {
         if (showLoading) {
@@ -95,6 +96,7 @@ public abstract class InfiniteAdapter<T> extends RecyclerView.Adapter<BaseViewHo
         }
     }
 
+    // Decide if we need show a loading animation
     @Override
     public int getItemCount() {
         return showLoading? data.size() + 1 : data.size();

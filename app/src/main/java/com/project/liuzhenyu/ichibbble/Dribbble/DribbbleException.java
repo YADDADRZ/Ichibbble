@@ -1,4 +1,4 @@
-package com.project.liuzhenyu.ichibbble.Dribbble.Auth;
+package com.project.liuzhenyu.ichibbble.Dribbble;
 
 /**
  * Created by liuzhenyu on 8/3/17.

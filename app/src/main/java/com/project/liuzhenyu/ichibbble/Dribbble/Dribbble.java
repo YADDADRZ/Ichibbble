@@ -6,28 +6,23 @@ package com.project.liuzhenyu.ichibbble.Dribbble;
  --------------------------------------------------------------------------------------------------*/
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.project.liuzhenyu.ichibbble.Dribbble.Auth.DribbbleException;
 import com.project.liuzhenyu.ichibbble.Model.Shot;
 import com.project.liuzhenyu.ichibbble.Model.User;
 import com.project.liuzhenyu.ichibbble.Utils.ModelUtils;
-import com.project.liuzhenyu.ichibbble.View.LoginActivity;
-import com.project.liuzhenyu.ichibbble.View.base.DribbbleTask;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class Dribbble {
@@ -62,6 +57,56 @@ public class Dribbble {
 
     // Http client
     private static OkHttpClient client = new OkHttpClient();
+
+    /*--------------------------------------------------------------------------------------------------
+    * HTTP request
+    --------------------------------------------------------------------------------------------------*/
+
+    // Form a builder with target url
+    private static Request.Builder authRequestBuilder(String url) {
+        return new Request.Builder().addHeader("Authorization", "Bearer " + accessToken)
+                .url(url);
+    }
+
+    // Build GET request & make request
+    private static Response makeGetRequest(@NonNull String url) throws DribbbleException {
+        Request request = authRequestBuilder(url).build();
+        return makeRequest(request);
+    }
+
+    // POST
+    private static Response makePostRequest(@NonNull String url, @NonNull RequestBody requestBody)
+            throws DribbbleException {
+        Request request = authRequestBuilder(url)
+                .post(requestBody).build();
+        return makeRequest(request);
+    }
+
+    // Execute the request; must run on the non-main thread
+    private static Response makeRequest(Request request) throws DribbbleException {
+        try {
+            Response response = client.newCall(request).execute();
+            return response;
+        } catch (IOException e) {
+            throw new DribbbleException(e.getMessage());
+        }
+    }
+
+    /*----------------------------------------------------------------------------------------------
+     * Parse response to target Type; User, Shot, List<Shot> ....
+    ----------------------------------------------------------------------------------------------*/
+
+    private static <T> T parseResponse(Response response, TypeToken<T> typeToken)
+            throws DribbbleException {
+        String responseString = null;
+        try {
+            responseString = response.body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.i("USER_INFO_RESPONSE", responseString);
+        return ModelUtils.toObject(responseString, typeToken);
+    }
 
     /*---------------------------------------------------------------------------------------------
       Login & Logout
@@ -100,7 +145,7 @@ public class Dribbble {
         storeAccessToken(context, null);
         storeUser(context, null);
 
-        // Clear local memory
+        // Clear local memory TODO clear sharePreference
         accessToken = null;
         user = null;
     }
@@ -125,51 +170,47 @@ public class Dribbble {
     }
 
     /*---------------------------------------------------------------------------------------------
-      GET request user info and store in SP
+      Get User info
      ---------------------------------------------------------------------------------------------*/
-
     private static User fetchUserInfo() throws DribbbleException {
-        Request resquest = authRequestBuilder(USER_END_POINT);
-        try {
-            Response response = client.newCall(resquest).execute();
-            return parseResponse(response, USER_TYPE);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new DribbbleException(e.getMessage());
-        }
-    }
-
-    private static Request authRequestBuilder(String url) {
-        return new Request.Builder().addHeader("Authorization", "Bearer " + accessToken)
-                .url(url).build();
-    }
-
-    private static <T> T parseResponse(Response response, TypeToken<T> typeToken)
-            throws IOException, JsonSyntaxException{
-        String responseString = response.body().string();
-        Log.i("USER_INFO_RESPONSE", responseString);
-        return ModelUtils.toObject(responseString, typeToken);
+        return parseResponse(makeGetRequest(USER_END_POINT), USER_TYPE);
     }
 
     /*----------------------------------------------------------------------------------------------
-      Shots info Retrieval Method (List<Shot>); 12 shots(one page) per API request.
+      Shots info Retrieval Method (List<Shot>);
+      12 shots(one page) per API request.
      ---------------------------------------------------------------------------------------------*/
     // GET SHOTS
     // This method must run on the non-main thread
     public static List<Shot> getShots(int page) throws DribbbleException{
-        Request request = authRequestBuilder(SHOT_END_POINT + "?page=" + page);
-        Log.i("SHOTS_REQUEST", request.toString());
-        try {
-            Response response = client.newCall(request).execute();
-            Log.i("SHOTS_RESPONSE", response.toString());
-            return parseResponse(response, SHOTS_TYPE);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new DribbbleException(e.getMessage());
+        return parseResponse(makeGetRequest(SHOT_END_POINT + "?page=" + page), SHOTS_TYPE);
+    }
+
+    /*--------------------------------------------------------------------------------------------------
+      Like
+      API: if shot is not like then return not_found;
+    --------------------------------------------------------------------------------------------------*/
+    // Checked the shot is likeed
+    public static Boolean isLikeShot(String id) throws DribbbleException {
+        String url = SHOT_END_POINT + "/" + id + "/like";
+        Response response = makeGetRequest(url);
+        switch (response.code()) {
+            case HttpURLConnection.HTTP_OK:
+                return true;
+            case HttpURLConnection.HTTP_NOT_FOUND:
+                return false;
+            default:
+                throw new DribbbleException(response.message());
         }
     }
 
-    public static Boolean isLikeShot(String id) {
-        return false;
+    // Like a shot
+    public static void like (String id) throws DribbbleException {
+
+    }
+
+    // unlike a shot
+    public static void unlike (String id) throws DribbbleException {
+
     }
 }

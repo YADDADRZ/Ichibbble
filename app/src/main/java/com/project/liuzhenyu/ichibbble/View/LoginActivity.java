@@ -6,15 +6,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.project.liuzhenyu.ichibbble.Dribbble.Auth.Auth;
 import com.project.liuzhenyu.ichibbble.Dribbble.Auth.AuthActivity;
-import com.project.liuzhenyu.ichibbble.Dribbble.Auth.DribbbleException;
+import com.project.liuzhenyu.ichibbble.Dribbble.DribbbleException;
 import com.project.liuzhenyu.ichibbble.Dribbble.Dribbble;
 import com.project.liuzhenyu.ichibbble.R;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;

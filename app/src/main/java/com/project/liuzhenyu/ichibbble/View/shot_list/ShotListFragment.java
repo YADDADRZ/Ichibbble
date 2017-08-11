@@ -1,39 +1,27 @@
 package com.project.liuzhenyu.ichibbble.View.shot_list;
 
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.google.gson.reflect.TypeToken;
-import com.project.liuzhenyu.ichibbble.Dribbble.Auth.DribbbleException;
+import com.project.liuzhenyu.ichibbble.Dribbble.DribbbleException;
 import com.project.liuzhenyu.ichibbble.Dribbble.Dribbble;
 import com.project.liuzhenyu.ichibbble.Model.Shot;
 import com.project.liuzhenyu.ichibbble.R;
-import com.project.liuzhenyu.ichibbble.Utils.ModelUtils;
 import com.project.liuzhenyu.ichibbble.View.base.DribbbleTask;
 import com.project.liuzhenyu.ichibbble.View.base.InfiniteAdapter;
 import com.project.liuzhenyu.ichibbble.View.base.SpaceItemDecoration;
-import com.project.liuzhenyu.ichibbble.View.shot_detail.ShotFragment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +45,7 @@ public class ShotListFragment extends Fragment {
 
     private int listType;
 
+    // TODO Type List
     public static ShotListFragment newInstance() {
         return new ShotListFragment();
     }
@@ -82,7 +71,7 @@ public class ShotListFragment extends Fragment {
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        // add Divider to recyclerView
         recyclerView.addItemDecoration(new SpaceItemDecoration(
                 getResources().getDimensionPixelOffset(R.dimen.space_medium)));
 

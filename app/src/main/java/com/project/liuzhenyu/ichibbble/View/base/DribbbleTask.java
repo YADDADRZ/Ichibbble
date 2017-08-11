@@ -2,7 +2,7 @@ package com.project.liuzhenyu.ichibbble.View.base;
 
 import android.os.AsyncTask;
 
-import com.project.liuzhenyu.ichibbble.Dribbble.Auth.DribbbleException;
+import com.project.liuzhenyu.ichibbble.Dribbble.DribbbleException;
 
 /*--------------------------------------------------------------------------------------------------
  * Created by liuzhenyu on 8/3/17.

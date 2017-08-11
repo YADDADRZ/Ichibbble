@@ -28,7 +28,6 @@ public class ShotListAdapter extends InfiniteAdapter<Shot> {
 
     private final ShotListFragment shotListFragment;
 
-
     /*----------------------------------------------------------------------------------------------
        Constructor
      ---------------------------------------------------------------------------------------------*/
@@ -42,7 +41,6 @@ public class ShotListAdapter extends InfiniteAdapter<Shot> {
     /*----------------------------------------------------------------------------------------------
       Override Methods
      ---------------------------------------------------------------------------------------------*/
-
     @Override
     protected BaseViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
         /*
