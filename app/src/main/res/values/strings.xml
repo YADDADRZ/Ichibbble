@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Ichibbble</string>
+    <string name="drawer_menu_home">Home</string>
+    <string name="drawer_menu_Likes">Likes</string>
+    <string name="drawer_menu_Buckets">Buckets</string>
+    <string name="drawer_header_dribbble">Dribbble</string>
+    <string name="shot_image">Shot Image</string>
+    <string name="actionbar_title_like">Likes</string>
+    <string name="actionbar_title_buckets">Buckets</string>
+    <string name="close_drawer">close_drawer</string>
+    <string name="open_drawer">open_drawer</string>
+    <string name="user_picture">User Picture</string>
+    <string name="share">Share</string>
+</resources>

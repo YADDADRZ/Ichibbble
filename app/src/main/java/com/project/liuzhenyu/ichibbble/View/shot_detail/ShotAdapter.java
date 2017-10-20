@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.project.liuzhenyu.ichibbble.Dribbble.Dribbble;
 import com.project.liuzhenyu.ichibbble.Model.Shot;
 import com.project.liuzhenyu.ichibbble.R;
 import com.project.liuzhenyu.ichibbble.Utils.ImageUtils;
@@ -79,7 +80,13 @@ public class ShotAdapter extends RecyclerView.Adapter {
                 ImageUtils.loadUserPicture(getContext(),
                         detailViewHolder.author_picture,
                         shot.user.avatar_url);
-                // TODO clickListener
+
+                detailViewHolder.like_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        shotFragment.like(shot.id, !shot.liked);
+                    }
+                });
 
                 Drawable likeDrawable = shot.liked?
                         ContextCompat.getDrawable(getContext(), R.drawable.ic_favorite_red_600_18dp)

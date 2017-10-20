@@ -49,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
                     .beginTransaction()
                     // Require support for android.support.v4.app.Fragment;
                     // Not android.app.Fragment
-                    .add(R.id.fragment_container, ShotListFragment.newInstance())
+                    .add(R.id.fragment_container,
+                            ShotListFragment.newInstance(ShotListFragment.LIST_TYPE_POPULAR))
                     .commit();
         }
 
@@ -138,11 +139,11 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.drawer_item_home:
-                        fragment = ShotListFragment.newInstance();
+                        fragment = ShotListFragment.newInstance(ShotListFragment.LIST_TYPE_POPULAR);
                         setTitle(R.string.app_name);
                         break;
                     case R.id.drawer_item_likes:
-                        fragment = ShotListFragment.newInstance();
+                        fragment = ShotListFragment.newInstance(ShotListFragment.LIST_TYPE_LIKED);
                         setTitle(getString(R.string.actionbar_title_like));
                         break;
                     case R.id.drawer_item_buckets:

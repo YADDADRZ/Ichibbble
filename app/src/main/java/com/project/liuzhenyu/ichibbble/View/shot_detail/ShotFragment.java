@@ -1,8 +1,9 @@
 package com.project.liuzhenyu.ichibbble.View.shot_detail;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,7 +39,7 @@ public class ShotFragment extends Fragment {
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
 
     private Shot shot;
-    private boolean isLiking;
+    private boolean isLiking; // Initial to be false; means havent like yet
     private ArrayList<String> collectedBucketIds;
 
     public static ShotFragment newInstance(@NonNull Bundle args) {
@@ -81,7 +82,9 @@ public class ShotFragment extends Fragment {
         shot = ModelUtils.toObject(getArguments().getString(KEY_SHOT), new TypeToken<Shot>(){});
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new ShotAdapter(this, shot));
-        new checkLikeTask().execute();
+
+        isLiking = true;
+        new CheckLikeTask().execute();
         // TODO Bucket
     }
 
@@ -93,7 +96,7 @@ public class ShotFragment extends Fragment {
     /*--------------------------------------------------------------------------------------------------
      * Like Task
     --------------------------------------------------------------------------------------------------*/
-    private class checkLikeTask extends DribbbleTask<Void, Void, Boolean> {
+    private class CheckLikeTask extends DribbbleTask<Void, Void, Boolean> {
 
         @Override
         protected Boolean doSomething(Void... params) throws DribbbleException {
@@ -113,5 +116,61 @@ public class ShotFragment extends Fragment {
             Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
         }
     }
-}
 
+    /*----------------------------------------------------------------------------------------------
+      * Why isLiking?
+      * Work like a semaphore
+      * Because we use muti-thread do the HTTP post request for like task, we need to set a lock,
+      * in case that if we click like and send to Dribbble but havent success and we click again.
+      * So, only when http request success, we can proceed another request.
+    ----------------------------------------------------------------------------------------------*/
+    // Execute Like task;
+    public void like (@NonNull String id, boolean like) {
+        if (!isLiking) {
+            isLiking = true;
+            new LikeTask(id, like).execute();
+        }
+    }
+
+    private class LikeTask extends DribbbleTask<Void, Void, Void> {
+
+        private String id;
+        private Boolean like;
+
+        public LikeTask(@NonNull String id, @NonNull Boolean like) {
+            this.id = id;
+            this.like = like;
+        }
+
+        @Override
+        protected Void doSomething(Void... params) throws DribbbleException {
+            if (like) {
+                Dribbble.like(id);
+            }else {
+                Dribbble.unlike(id);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void s) {
+            isLiking = false;
+            shot.liked = like;
+            shot.likes_count += like? 1 : -1;
+            recyclerView.getAdapter().notifyDataSetChanged();
+            setResult(); // Achieve the change from grey heart to red heart
+        }
+
+        @Override
+        protected void onFailed(DribbbleException e) {
+            isLiking = false;
+            Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void setResult() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(KEY_SHOT, ModelUtils.toString(shot, new TypeToken<Shot>(){}));
+        getActivity().setResult(Activity.RESULT_OK, resultIntent);
+    }
+}
